@@ -1,0 +1,20 @@
+
+        {/*{modal && (
+          <div className="w-[25%] rounded-sm">
+            <h4>Welcome to lezzy</h4>
+          </div>
+        )}*/}
+        
+         {/* GAME OVER */}
+        {dead && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+            <h2 className="text-4xl font-bold mb-2 text-red-500">GAME OVER</h2>
+            <p className="mb-4">Score: {score}</p>
+            <button
+              onClick={reset}
+              className="px-4 py-2 border border-white hover:bg-white hover:text-black cursor-pointer"
+            >
+              Restart
+            </button>
+          </div>
+        )}
