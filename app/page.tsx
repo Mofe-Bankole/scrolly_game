@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import alien from "./icons/alien.png";
+import alienIcon from "./icons/alien.png";
 import solIcon from "./icons/SOL.png";
 import ethIcon from "./icons/ETH.png";
 import bnbIcon from "./icons/BNB.png";
@@ -313,7 +313,7 @@ const GameSandbox: FC = () => {
         {enemies.map((e) => (
           <Image
             alt="Enemy"
-            src={alien.src}
+            src={alienIcon.src}
             width={38}
             height={38}
             key={e.id}
