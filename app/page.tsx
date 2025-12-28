@@ -2,13 +2,13 @@
 
 import { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import alien from "alien.png";
 import solIcon from "./icons/SOL.png";
 import ethIcon from "./icons/ETH.png";
 import bnbIcon from "./icons/BNB.png";
 import avaxIcon from "./icons/AVAX.png";
 import usdcIcon from "./icons/USDC.png";
 import commando from "./icons/commando.png";
-import alien from "./icons/alien.png";
 
 type Bullet = {
   id: number;
