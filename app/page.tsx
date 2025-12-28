@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import alien from "alien.png";
+import alien from "./icons/alien.png";
 import solIcon from "./icons/SOL.png";
 import ethIcon from "./icons/ETH.png";
 import bnbIcon from "./icons/BNB.png";
