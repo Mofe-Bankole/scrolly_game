@@ -36,28 +36,59 @@ const GameSandbox: FC = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [playing, setPlaying] = useState(false);
   const [welcomePassed, setWelcomePassed] = useState(false);
-  const sounds = {
-    shot: new Audio("shot.wav"),
-    game_over: new Audio("game_over.wav"),
-  };
-
-  function playShot() {
-    const sound = sounds.shot;
-    sound.currentTime = 0;
-    sound.play();
-  }
-  function playGameOver() {
-    const sound = sounds.game_over;
-    sound.currentTime = 0;
-    sound.play();
-  }
-  // 🔥 global enemy speed multiplier
   const [enemySpeedMul, setEnemySpeedMul] = useState(1);
 
   const gameRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
   const bulletsRef = useRef<Bullet[]>([]);
   const enemiesRef = useRef<Enemy[]>([]);
+  const soundsRef = useRef<{ shot: HTMLAudioElement | null; game_over: HTMLAudioElement | null }>({
+    shot: null,
+    game_over: null,
+  });
+
+  const cannonX = 5;
+  const [cannonY, setCannonY] = useState(50);
+
+  /* ---------------- INITIALIZE AUDIO (CLIENT-SIDE ONLY) ---------------- */
+  useEffect(() => {
+    // Only initialize Audio on client-side
+    soundsRef.current = {
+      shot: new Audio("/shot.wav"),
+      game_over: new Audio("/game_over.wav"),
+    };
+
+    return () => {
+      // Cleanup audio on unmount
+      if (soundsRef.current.shot) {
+        soundsRef.current.shot.pause();
+        soundsRef.current.shot.src = "";
+      }
+      if (soundsRef.current.game_over) {
+        soundsRef.current.game_over.pause();
+        soundsRef.current.game_over.src = "";
+      }
+    };
+  }, []);
+
+  /* ---------------- SOUND FUNCTIONS ---------------- */
+  const playShot = () => {
+    if (soundsRef.current.shot) {
+      soundsRef.current.shot.currentTime = 0;
+      soundsRef.current.shot.play().catch(() => {
+        // Silently handle if audio fails to play
+      });
+    }
+  };
+
+  const playGameOver = () => {
+    if (soundsRef.current.game_over) {
+      soundsRef.current.game_over.currentTime = 0;
+      soundsRef.current.game_over.play().catch(() => {
+        // Silently handle if audio fails to play
+      });
+    }
+  };
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -68,9 +99,6 @@ const GameSandbox: FC = () => {
     enemiesRef.current = enemies;
   }, [enemies]);
 
-  const cannonX = 5;
-  const [cannonY, setCannonY] = useState(50);
-
   /* ---------------- TIMER ---------------- */
   useEffect(() => {
     if (!playing || dead) return;
@@ -79,6 +107,7 @@ const GameSandbox: FC = () => {
       setTimeLeft((t) => {
         if (t <= 1) {
           setDead(true);
+          playGameOver();
           return 0;
         }
         return t - 1;
@@ -93,7 +122,7 @@ const GameSandbox: FC = () => {
     if (!playing || dead) return;
 
     const interval = setInterval(() => {
-      setEnemySpeedMul((m) => Math.min(m * 1, 6));
+      setEnemySpeedMul((m) => Math.min(m * 1.1, 6));
     }, 5000);
 
     return () => clearInterval(interval);
@@ -139,6 +168,7 @@ const GameSandbox: FC = () => {
           .filter((e) => {
             if (e.x <= 3) {
               setDead(true);
+              playGameOver();
               return false;
             }
             return true;
@@ -186,7 +216,6 @@ const GameSandbox: FC = () => {
       // Update both states with the calculated results
       setBullets(newBullets);
       setEnemies(survivingEnemies);
-      // playGameOver()
     }, 16);
 
     return () => clearInterval(interval);
@@ -247,7 +276,6 @@ const GameSandbox: FC = () => {
         onClick={shoot}
         className="relative w-full h-full max-w-[420px] max-h-[90svh] aspect-[9/16] bg-[#0B0F1A] overflow-hidden select-none mx-auto shadow-xl rounded-lg"
         style={{
-          // To provide full height on mobile, but keep reasonable center on desktop
           minWidth: "min(100vw,420px)",
           minHeight: "min(90svh, calc(100vw*16/9), 700px)",
           boxSizing: "border-box",
