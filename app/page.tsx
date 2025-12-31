@@ -1,6 +1,6 @@
 "use client";
 
-// useful imports 
+// useful imports
 import { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import alienIcon from "./icons/alien.png";
@@ -12,7 +12,6 @@ import bnbIcon from "./icons/BNB.png";
 import avaxIcon from "./icons/AVAX.png";
 import usdcIcon from "./icons/USDC.png";
 import commando from "./icons/commando.png";
-
 
 // Types
 type Bullet = {
@@ -50,6 +49,7 @@ const GameSandbox: FC = () => {
   const idRef = useRef(0);
   const bulletsRef = useRef<Bullet[]>([]);
   const enemiesRef = useRef<Enemy[]>([]);
+
   const soundsRef = useRef<{
     shot: HTMLAudioElement | null;
     game_over: HTMLAudioElement | null;
@@ -143,18 +143,22 @@ const GameSandbox: FC = () => {
   useEffect(() => {
     if (!playing || dead || win) return;
 
-    const spawn = setInterval(() => {
-      const randomAlien = ALIEN_ICONS[Math.floor(Math.random() * ALIEN_ICONS.length)];
-      setEnemies((e) => [
-        ...e,
-        {
-          id: idRef.current++,
-          x: 100,
-          y: Math.random() * 80 + 10,
-          icon: randomAlien.src,
-        },
-      ]);
-    }, 800);
+    const spawn = setInterval(
+      () => {
+        const randomAlien =
+          ALIEN_ICONS[Math.floor(Math.random() * ALIEN_ICONS.length)];
+        setEnemies((e) => [
+          ...e,
+          {
+            id: idRef.current++,
+            x: 100,
+            y: Math.random() * 80 + 10,
+            icon: randomAlien.src,
+          },
+        ]);
+      },
+      Math.max(1200 - score * 10, 600),
+    );
 
     return () => clearInterval(spawn);
   }, [playing, dead, win]);
@@ -176,7 +180,7 @@ const GameSandbox: FC = () => {
         es
           .map((e) => ({
             ...e,
-            x: e.x - (0.6 * enemySpeedMul + score * 0.03),
+            x: e.x - (0.4 * enemySpeedMul + Math.min(score, 30) * 0.015),
           }))
           .filter((e) => {
             if (e.x <= 3) {
@@ -210,7 +214,7 @@ const GameSandbox: FC = () => {
         const bulletIndex = newBullets.findIndex((b) => {
           const dx = b.x - enemy.x;
           const dy = b.y - enemy.y;
-          return Math.sqrt(dx * dx + dy * dy) < 4;
+          return Math.sqrt(dx * dx + dy * dy) < 5.8;
         });
 
         if (bulletIndex !== -1) {
@@ -286,27 +290,27 @@ const GameSandbox: FC = () => {
       <div
         ref={gameRef}
         onClick={shoot}
-        className="relative w-full h-full max-w-[420px] max-h-[90svh] aspect-9/16 overflow-hidden select-none mx-auto shadow-xl rounded-lg"
+        className="relative w-full max-w-[420px] h-full aspect-9/16 overflow-hidden select-none mx-auto shadow-xl rounded-lg"
         style={{
           minWidth: "min(100vw,420px)",
           minHeight: "min(90svh, calc(100vw*16/9), 700px)",
           backgroundImage:
-            "url('https://images.pexels.com/photos/2387793/pexels-photo-2387793.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1920&dpr=2')",
+            "url('https://wallpapers.com/images/hd/epic-landscape-8-bit-5jhiwc2chj55nzgg.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundColor: "#050816",
+          backgroundColor: "#000000",
           boxSizing: "border-box",
         }}
       >
         {/* HUD */}
-        <div className="absolute top-2 left-3 text-xs sm:text-sm mb-1 z-10">
+        <div className="absolute bottom-2 left-3 text-xs sm:text-sm mb-2 z-10">
           <span>Score: {score}</span>
         </div>
-        <div className="absolute top-2 right-3 text-xs sm:text-sm z-10">
+        <div className="absolute bottom-2 right-3 text-xs sm:text-sm mb-2 z-10">
           ⏱ {timeLeft}s
         </div>
-        <div className="absolute top-7 left-3 text-xs opacity-70 z-10">
+        <div className="absolute top-4 left-3 text-xs opacity-70 z-10">
           Speed ×{enemySpeedMul.toFixed(2)}
         </div>
 
@@ -382,26 +386,33 @@ const GameSandbox: FC = () => {
 
         {/* START */}
         {!playing && !dead && !welcomePassed && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-lg px-5 py-6 z-20">
-            <p className="text-white text-base font-bold mb-2">Set in 2026</p>
-            <p className="text-white text-xs mb-1">
-              Aliens have taken over the world<br/>You Sergent James Reef
+          <div className="absolute inset-0 flex flex-col  justify-center bg-black/70 rounded-lg px-5 py-6 z-20">
+            <p className="text-white text-base font-bold mb-2">
+              Set in 2079...
             </p>
-            <p className="text-indigo-400 text-base uppercase font-bold mb-3 tracking-wider">
+            <p className="text-white text-xs mb-3.5">
+              Evil Aliens are constantly hunting down humans
+              <br />
+              You Sergent James Reef are tasked with protecting the last human
+              stronghold before the bombs can be deployed to your current
+              position
+            </p>
+
+            <p className="text-indigo-400 text-xs uppercase font-bold mb-1 tracking-wider">
               How to Play?
             </p>
-            <p className="mb-2 text-center text-gray-100 text-xs font-medium px-1 leading-relaxed">
-              Cryptondo is a commando-style game.
+            <p className="mb-2  text-gray-100 text-xs font-medium leading-relaxed">
+              Crypto Commando is a commando-style game.
               <br />
               Shoot enemies with tokens.{" "}
               <span className="text-red-400 font-bold">Survive</span> for 60s!
             </p>
             <button
               aria-label="Tap to Start"
-              className="px-7 py-2 bg-indigo-600 text-white cursor-pointer rounded uppercase text-sm mt-2 font-semibold shadow hover:bg-indigo-700 transition"
+              className="px-7 py-2 bg-amber-700 text-white cursor-pointer rounded uppercase text-sm mt-2 font-semibold shadow hover:bg-indigo-700 transition"
               onClick={() => setWelcomePassed(true)}
             >
-              Tap to Start
+              Tap Anywhere to Start
             </button>
           </div>
         )}
@@ -409,7 +420,7 @@ const GameSandbox: FC = () => {
         {/* GAME OVER */}
         {dead && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white rounded-lg z-30">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-red-600 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-red-600  inset-7 tracking-tight">
               ☠️ GAME OVER ☠️
             </h2>
             <p className="mb-2 text-lg">
@@ -428,21 +439,19 @@ const GameSandbox: FC = () => {
 
         {win && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white rounded-lg z-30">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-red-600 tracking-tight">
-          🪽 YOU WIN 🪽
-          </h2>
-          <p className="mb-2 text-lg">
-            You survived for 60 secs
-          </p>
-          <p className="mb-4 text-base font-semibold">Score: {score}</p>
-          <button
-            onClick={reset}
-            aria-label="Restart"
-            className="cursor-pointer px-7 py-2 bg-white/30 border border-white/60 text-white rounded font-semibold shadow backdrop-blur-xl hover:bg-white/50 transition"
-          >
-            Restart
-          </button>
-        </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-green-500  tracking-tight">
+              🪽 YOU WIN 🪽
+            </h2>
+            <p className="mb-2 text-lg">You survived for 60 secs</p>
+            <p className="mb-4 text-base font-semibold">Score: {score}</p>
+            <button
+              onClick={reset}
+              aria-label="Restart"
+              className="cursor-pointer px-7 py-2 bg-white/30 border border-white/60 text-white rounded font-semibold shadow backdrop-blur-xl hover:bg-white/50 transition"
+            >
+              Restart
+            </button>
+          </div>
         )}
       </div>
     </div>
