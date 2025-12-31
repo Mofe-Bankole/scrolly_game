@@ -2,6 +2,11 @@
   "name": "scribbly-gamejam",
   "version": "0.1.0",
   "private": true,
+  "author" : {
+    "email" : "bankoleadedotun16@gmail.com",
+    "name": "Bankole Adedotun",
+    "url": "github.com/Mofe-Bankole"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
